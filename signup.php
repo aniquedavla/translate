@@ -1,6 +1,9 @@
 <?php
     //make conenction with msql
-    require_once "login.php";
+    require_once "mysqlLogin.php";
+    //shared functions in util.php
+    require_once "util.php";
+
     $conn = new mysqli($hn, $un, $pw, $db);
     if($conn->connect_error){
         die(error("connectionerror"));
@@ -19,15 +22,23 @@
         $query = "INSERT INTO USERS(fullName, email, username, hashedPW, salt1, salt2) VALUES('$fullName','$email','$username', '$hashedPw','$salt1', '$salt2')";
         $result = $conn->query($query);
         echo $result;
-        if (!$result) die(error("failUser"));        
+        if (!$result) {
+            die(error("failUser"));
+        } else {
+            //12hr session limit
+            ini_set('session.gc_maxlifetime', 60 * 60 * 12);
+            session_start();
+            $_SESSION['username'] = $username;
+            $_SESSION['check'] = hash('ripemd128', $_SERVER['REMOTE_ADDR'] .$_SERVER['HTTP_USER_AGENT']);
+            echo "<br>", "Welcome, ".$username,"<br>";
+            die("<p><a href=/auth>Click here to continue</a></p>");
+            session_destroy();
+        }
+
     } else{
         signUpForm();
     }
 
-    
-    function addUser($connection,$fullName, $email, $un, $hashedPw, $salt) {
-       
-    }
     $conn->close();
     
     function signUpForm(){
@@ -64,7 +75,7 @@
                 }
             </style>
             <body>
-                <form method='post' action='signup.php' enctype='multipart/form-data'>
+                <form method='post' action='/signup' enctype='multipart/form-data'>
                     <fieldset>
                     <legend>Sign Up</legend>
                     <label for="fullName">Full Name</label>
@@ -85,37 +96,6 @@
                     <input type='submit' value='Sign Up' size='100'>
                     </fieldset>
                 </form>
-            _END;
-    
-    }
-       
-    //Error handler
-    function error($errorType){
-        if($errorType === "wronginput"){
-            echo <<< _END
-                <h3> Wrong or incomplete input. Please enter all inputs in the right format!</h3>
-            _END;
-        } else if($errorType === "connectionerror"){
-            echo <<< _END
-                <h3 style="color:red;">There was an error getting the right information. Please try again later! <br> If the problem persists contact admin@serversideexperts.com</h3>
-            _END;
-        }
-        else if($errorType === "failUser"){
-            echo <<< _END
-                <h3 style="color:red;">Failed to register user. Enter all fields correctly. Make sure username and email are unique.</h3>
-            _END;
-        }
-    }
-
-    //sanitizes user input to prevent hacking attempts for sql injection and cross site scripting
-    function sanitizeData($conn, $str){
-        return htmlentities(sanitizeForMysql($conn, $str));
-    }
-
-    function sanitizeForMysql($conn, $str){
-        // if(get_magic_quotes_gpc()){
-        //     $str = stripslashes($str);
-        // }
-        return $conn->real_escape_string($str);
+        _END;
     }
 ?>

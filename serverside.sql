@@ -1,4 +1,4 @@
-//USERS
+-- USERS Table
 CREATE table USERS(
     id SMALLINT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     fullName varchar(255),
