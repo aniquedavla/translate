@@ -5,12 +5,14 @@
         <head><title>Lame Translate</title></head>
         <style>
             body{
+                text-align:center;
                 font-size: 150%;
             }
             h3{
                 color: red;
             }
             button {
+                font-align:center;
                 color: white;
                 margin: 4px 2px;
                 cursor: pointer;

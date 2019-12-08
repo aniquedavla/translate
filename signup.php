@@ -86,7 +86,7 @@
             </style>
             <body>
                 <h4>Lame Translate - Loozers Achieving Mindboggling Eliteness
-                <button type="button" onclick="window.location.href = '/'">Logout</button></h4>
+                <button type="button" onclick="window.location.href = '/login'">Login</button></h4>
                 <form method='post' action='/signup' enctype='multipart/form-data'>
                     <fieldset>
                     <legend>Sign Up</legend>
