@@ -10,10 +10,10 @@
     }
     
     if(isset($_POST['email']) && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['confirmPass'])){
-        echo "Data entered";
+        //echo "Data entered";
         $salt1 = bin2hex(random_bytes(8));
         $salt2 = bin2hex(random_bytes(8));
-        echo $salt1, $salt2;
+        //echo $salt1, $salt2;
         $fullName = sanitizeData($conn, $_POST['fullName']);
         $email = sanitizeData($conn, $_POST['email']);
         $username = sanitizeData($conn, $_POST['username']);
@@ -29,6 +29,7 @@
             ini_set('session.gc_maxlifetime', 60 * 60 * 12);
             session_start();
             $_SESSION['username'] = $username;
+            //to check for session hijacking
             $_SESSION['check'] = hash('ripemd128', $_SERVER['REMOTE_ADDR'] .$_SERVER['HTTP_USER_AGENT']);
             echo "<br>", "Welcome, ".$username,"<br>";
             die("<p><a href=/auth>Click here to continue</a></p>");
@@ -57,24 +58,35 @@
                     margin-bottom: 25px;
                     display: block;
                 }
-                input[type=number]{
-                    
-                }
-                input [type=submit]{
-                    text-align: right;
+                input[type=submit]{
+                    background-color: #008CBA;
+                    color:white;
+                    font-size: 20px;
+                    padding: 4px 12px;
+                    cursor: pointer;
                 }
                 h3{
                     color: red;
-                }
-                table, th, td {
-                    border: 1px solid black;
                 }
                 fieldset{
                     border: 5px solid skyblue;
                     padding: 10px;
                 }
+                button {
+                    color: white;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    background-color: #008CBA;
+                    font-size: 12px;
+                    padding: 12px 28px;
+                }
+                h4{
+                    color:#4CAF50;
+                }
             </style>
             <body>
+                <h4>Lame Translate - Loozers Achieving Mindboggling Eliteness
+                <button type="button" onclick="window.location.href = '/'">Logout</button></h4>
                 <form method='post' action='/signup' enctype='multipart/form-data'>
                     <fieldset>
                     <legend>Sign Up</legend>
@@ -93,7 +105,7 @@
                     <label for="confirmPass">Confirm Password</label>
                     <input type='text' name='confirmPass' size='20' required>
                     <br>
-                    <input type='submit' value='Sign Up' size='100'>
+                    <input type='submit' value='Sign Up'>
                     </fieldset>
                 </form>
         _END;

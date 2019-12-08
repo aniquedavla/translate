@@ -27,5 +27,5 @@
             <button type="button" onclick="window.location.href = '/login'">Login</button>
             <button type="button" onclick="window.location.href = '/signup'">Sign up</button>
         </body>
-    _END
+    _END;
 ?>

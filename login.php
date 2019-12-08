@@ -31,6 +31,7 @@
                     ini_set('session.gc_maxlifetime', 60 * 60 * 12); //12hr session limit
                     session_start();
                     $_SESSION['username'] = $username_temp;
+                    //to check for session hijacking
                     $_SESSION['check'] = hash('ripemd128', $_SERVER['REMOTE_ADDR'] .$_SERVER['HTTP_USER_AGENT']);
                     echo "<br>", "Welcome, ".$_SESSION['username'],"<br>";
                     die("<p><a href=/auth>Click here to continue</a></p>");
@@ -44,7 +45,7 @@
 
             $saltsResult->close();
 
-    } else { 
+    } else {
         //if no username and password set
         header('WWW-Authenticate: Basic realm="Restricted Section"');
         header('HTTP/1.0 401 Unauthorized');
