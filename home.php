@@ -1,4 +1,8 @@
 <?php
+    require_once "util.php";
+    //all sessions are deleted once a user logs out. the page is routed to home when a user logs out.
+    session_start();
+    destroy_session_and_data(); //session security 
     echo <<< _END
         <!DOCTYPE html>
         <html>
@@ -12,7 +16,7 @@
                 color: red;
             }
             button {
-                font-align:center;
+                text-align:center;
                 color: white;
                 margin: 4px 2px;
                 cursor: pointer;

@@ -35,6 +35,14 @@
             echo <<< _END
                 <h3 style="color:red;">There was a technical error. Please login again. Thank You!</h3>
             _END;
+        } else if($errorType === "wrongfile"){
+            echo <<< _END
+                <h3 style="color:red;">Upload the file in the correct format. Try agian!</h3>
+            _END;
+        } else if($errorType === "invalidjson"){
+            echo <<< _END
+                <h3 style="color:red;">Please enter a json file in the right format.</h3>
+            _END;
         }
     }
     

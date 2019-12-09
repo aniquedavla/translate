@@ -8,3 +8,11 @@ CREATE table USERS(
     salt1 varchar(32)  NOT NULL
     salt2 varchar(3 2) NOT NULL
 );
+
+CREATE table TranslationModels(
+    username varchar(30) NOT NULL UNIQUE PRIMARY KEY,
+    translationName varchar(255),
+    fromLanguage varchar(32) NOT NULL, 
+    toLanguage varchar(32) NOT NULL,
+    translationModel json NOT NULL
+);
