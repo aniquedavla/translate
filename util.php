@@ -43,6 +43,10 @@
             echo <<< _END
                 <h3 style="color:red;">Please enter a json file in the right format.</h3>
             _END;
+        } else if($errorType === "sns"){
+            echo <<< _END
+                <h3 style="color:red;">There was a technical error getting the right info. Try again later.</h3>
+            _END;
         }
     }
     

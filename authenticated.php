@@ -22,10 +22,8 @@
             echo <<< _END
                 <legend><h2>Welcome, <b>$username</b></h2></legend>
                 <p>Upload a translation model from a language to another in a json file.
-                <br>Only one langugae pair per json file allowed. All key-value pairs should be under one JSON object only.
+                <br>Only one language-pair per json file allowed. All key-value pairs should be under one JSON object only.
                 <br>Select the language you are translating below.</p>
-            _END;
-            echo <<< _END
                 <form id= "modelForm" method='post' action='/auth' enctype='multipart/form-data'>
                     <fieldset>
                     <legend>Uplod a translation model</legend>
@@ -55,18 +53,53 @@
                             <option value="russian">Russian</option>
                         </select>
                     </div>
-                    <label for="tranModel">Translation Model:</label>
+                    <label for="tranModel">Translation model:</label>
                     <input type='file' name='tranModel' size='20' required>
                     <br>
                     <input type='submit' name='submitButton' value='Submit'>
 
                     </fieldset>
                 </form> 
+                <br>
+                <form id= "translationForm" method='post' action='/auth' enctype='multipart/form-data'>
+                    <fieldset>
+                    <legend>Translate your text</legend>
+                    <label for="languageSelectorTranslate">Select the language you are translating:</label>
+                    <div id="langugeSelectorTranslate">
+                        <label for="fromLangTranslate">From:</label>
+                        <select id="fromLangTranslate" name="fromLangTranslate" form="translationForm" required>
+                            <option value=""></option>
+                            <option value="french">English</option>
+                            <option value="french">French</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="italian">Italian</option>
+                            <option value="german">German</option>
+                            <option value="russian">Russian</option>
+                        </select>
+                        <label for="toLangTranslate">To:</label>
+                        <select id="toLangTranslate" name="toLangTranslate" form="translationForm" required>
+                            <option value=""></option>
+                            <option value="french">English</option>
+                            <option value="french">French</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="italian">Italian</option>
+                            <option value="german">German</option>
+                            <option value="russian">Russian</option>
+                        </select>
+                    </div>
+                    <label for="searchTranslation">Text to translate:</label>
+                    <textarea name='searchTranslation' rows="2" cols="50" placeholder="text to translate" form="translationForm" required></textarea> 
+                    <br>
+                    <input type='submit' name='submitButtonTranslate' value='Submit'>
+                    </fieldset>
+                </form> 
             _END;
             
-               
             if(!empty($_POST['fromLang']) && isset($_POST['fromLang']) && !empty($_POST['toLang']) && isset($_POST['toLang']) && $_FILES){
                 $filename = $_FILES['tranModel']['name'];
+                $fromLang = sanitizeData($conn, $_POST['fromLang']);
+                $toLang = sanitizeData($conn, $_POST['toLang']);
+                $translationName = sanitizeData($conn, $_POST['tranName']);
                 //echo $filename;
                 //checks if uploaded file has text content.
                 //echo $_FILES['tranModel']['type'];
@@ -81,12 +114,18 @@
                         echo "<br>";
                         //sanitize the input
                         $name = $filenameSanitized;
-                        $fileData = sanitizeData($conn, $fileContents);
-                        echo $name;
-                        echo $fileData;
-                        // $sendDataQuery = "INSERT INTO FileData(name, filedata, filename) VALUES" . "('$name','$fileData','$filenameSanitized')";
-                        // $sendResult = $conn->query($sendDataQuery); 
-                        // if (!$sendResult) echo "INSERT failed: $sendResult" . "Please try again later!";
+                        $fileDataSanitized = sanitizeData($conn, $fileContents);
+                        //echo $name;
+                        //echo $fileDataSanitized;
+                        if(!function_exists('json_decode')) die(error("sns"));
+                        $jsonArray = json_decode($fileContents, true);
+                        
+                        //placeholders to prevent hacking attempts
+                        $insertStmt = $conn->prepare("INSERT INTO TranslationModels(username, translationName, fromLanguage, toLanguage, translationModel) VALUES(?,?,?,?,?)");
+                        $insertStmt->bind_param('sssss', $username, $translationName, $fromLang, $toLang, $fileContents);
+                        $insertStmt->execute();
+                        printf("%d Information added successfully. \n", $insertStmt->affected_rows);
+                        $insertStmt->close();
                     } else {
                         error("invalidjson");
                     }
@@ -143,6 +182,13 @@
                 }
                 p{
                     font-family: Minion Pro;
+                }
+                label #searchTranslation{
+                    padding-bottom: 12px;
+                }
+                fieldset{
+                    border: 5px solid gray;
+                    padding: 10px;
                 }
             </style>
             <body>
