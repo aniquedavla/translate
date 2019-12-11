@@ -158,12 +158,20 @@
                     $translatedString = "";
                     for($wordI=0; $wordI < sizeof($textToTranslateWords); $wordI++){
                         $toTranslateWord = $textToTranslateWords[$wordI];
-                        if($tranlatedWord = $transModelArray[$toTranslateWord]){
+                        if(isset($transModelArray[$toTranslateWord])){
+                            $tranlatedWord = $transModelArray[$toTranslateWord];
                             $translatedString .= " " . $tranlatedWord;
+                        } else { 
+                            echo <<< _END
+                                $toTranslateWord not found in the model
+                                <br>
+                            _END;
                         }
                     }
                     echo <<< _END
-                        <p>Translation: <p id="translated"">$translatedString</p></p>
+                        <hr>
+                            Translation<div id="translated">$translatedString</div>
+                        <hr>
                     _END;
                 }
                 
