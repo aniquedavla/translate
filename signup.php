@@ -35,11 +35,14 @@
             die("<p><a href=/auth>Click here to continue</a></p>");
             session_destroy();
         }
+        
+        $result->close();
 
     } else{
         signUpForm();
     }
-
+    
+    //all other connections are closed in the scope they were defined.
     $conn->close();
     
     function signUpForm(){

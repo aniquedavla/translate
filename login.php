@@ -51,4 +51,6 @@
         header('HTTP/1.0 401 Unauthorized');
         die ("Please enter your username and password");
     }
+    //all other connections are closed in the scope they were defined.
+    $conn->close();
 ?>

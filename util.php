@@ -15,7 +15,7 @@
     function error($errorType){
         if($errorType === "wronginput"){
             echo <<< _END
-                <h3> Wrong or incomplete input. Please enter all inputs in the right format!</h3>
+                <h3 style="color:red;"> Wrong or incomplete input. Please enter all inputs in the right format!</h3>
             _END;
         } else if($errorType === "connectionerror"){
             echo <<< _END
@@ -46,6 +46,10 @@
         } else if($errorType === "sns"){
             echo <<< _END
                 <h3 style="color:red;">There was a technical error getting the right info. Try again later.</h3>
+            _END;
+        }else if($errorType === "nomodelfound"){
+            echo <<< _END
+                <h3 style="color:red;"> Try again! No translation found for your selection.</h3>
             _END;
         }
     }

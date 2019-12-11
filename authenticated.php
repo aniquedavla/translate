@@ -23,7 +23,6 @@
                 <legend><h2>Welcome, <b>$username</b></h2></legend>
                 <p>Upload a translation model from a language to another in a json file.
                 <br>Only one language-pair per json file allowed. All key-value pairs should be under one JSON object only.
-                <br>Select the language you are translating below.</p>
                 <form id= "modelForm" method='post' action='/auth' enctype='multipart/form-data'>
                     <fieldset>
                     <legend>Uplod a translation model</legend>
@@ -95,6 +94,7 @@
                 </form> 
             _END;
             
+            //translation model handler
             if(!empty($_POST['fromLang']) && isset($_POST['fromLang']) && !empty($_POST['toLang']) && isset($_POST['toLang']) && $_FILES){
                 $filename = $_FILES['tranModel']['name'];
                 $fromLang = sanitizeData($conn, $_POST['fromLang']);
@@ -118,7 +118,6 @@
                         //echo $name;
                         //echo $fileDataSanitized;
                         if(!function_exists('json_decode')) die(error("sns"));
-                        $jsonArray = json_decode($fileContents, true);
                         
                         //placeholders to prevent hacking attempts
                         $insertStmt = $conn->prepare("INSERT INTO TranslationModels(username, translationName, fromLanguage, toLanguage, translationModel) VALUES(?,?,?,?,?)");
@@ -133,11 +132,50 @@
                     error("wrongfile");
                 }
             }
+            
+            //translator handler
+            if(!empty($_POST['fromLangTranslate']) && isset($_POST['fromLangTranslate']) && !empty($_POST['toLangTranslate']) && isset($_POST['toLangTranslate']) && !empty($_POST['searchTranslation']) && isset($_POST['searchTranslation'])){
+                $fromLangTranslate = sanitizeData($conn, $_POST['fromLangTranslate']);
+                $toLangTranslate = sanitizeData($conn, $_POST['toLangTranslate']);
+                $textToTraslate  = sanitizeData($conn, $_POST['searchTranslation']);
+                //echo $fromLangTranslate, $toLangTranslate, $textToTraslate;
+                //get translation model for language selected.
+                $searchStmt = "SELECT translationModel FROM TranslationModels WHERE fromLanguage='$fromLangTranslate' && toLanguage='$toLangTranslate'";
+                $searchResult = $conn->query($searchStmt);
+                if (!$searchResult) {
+                    //printf("%d Information added successfully. \n", $result->affected_rows); 
+                    echo die(error("nomodelfound"));
+                } else {
+                    //translate word based on translation model found.
+                    $transModel = $searchResult->fetch_assoc();
+                    $firstModel = $transModel["translationModel"];
+                    $transModelArray = json_decode($firstModel, true);
+                    //echo print_r($transModelArray);
+                    //$textToTranslateSpecCharLess = preg_replace("/[^A-Za-z0-9 ]/", '', $textToTraslate);
+                    $textToTranslateWords = explode(" ", $textToTraslate);
+                    //echo $textToTranslateSpecCharLess,
+                    //echo "<br>", print_r($textToTranslateWords), sizeof($textToTranslateWords);        
+                    $translatedString = "";
+                    for($wordI=0; $wordI < sizeof($textToTranslateWords); $wordI++){
+                        $toTranslateWord = $textToTranslateWords[$wordI];
+                        if($tranlatedWord = $transModelArray[$toTranslateWord]){
+                            $translatedString .= " " . $tranlatedWord;
+                        }
+                    }
+                    echo <<< _END
+                        <p>Translation: <p id="translated"">$translatedString</p></p>
+                    _END;
+                }
+                
+                $searchResult->close();
+            }
         }
     } else {
         die(error("failUser"));
     }
-
+    //all other connections are closed in the context they were defined.
+    $conn->close();
+    
     function headerHtml(){
         echo <<< _END
             <!DOCTYPE html>
@@ -190,6 +228,10 @@
                     border: 5px solid gray;
                     padding: 10px;
                 }
+                #translated{
+                    font-size:20px;
+                    color:green;
+                }
             </style>
             <body>
                 <h4>Lame Translate - Loozers Achieving Mindboggling Eliteness
@@ -206,4 +248,5 @@
     }
     //sesssion security
     //all sessions are deleted once a user logs out. the page is routed to home.php when a user logs out.                
+
 ?>
